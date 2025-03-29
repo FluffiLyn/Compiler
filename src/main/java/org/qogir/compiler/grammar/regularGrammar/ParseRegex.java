@@ -45,14 +45,14 @@ public class ParseRegex {
         //System.out.println("\t2.1) Convert the regex into a tree.");
         if(this.queue.isEmpty())
             return null;
-
+         int match=0;
         RegexTree tree = new RegexTree();
 
         Stack<RegexTreeNode> stack = new Stack<>();
         //lookahead char
         char look = this.queue.poll();
 
-        if(!Character.isLetter(look) && look != '('){ //look != 'ε' &&
+        if(!(look>='A'&&look<='Z') && !(look>='a'&&look<='z')&& look != '('){ //look != 'ε' &&
             //The first char must be a letter, ε or '('
             System.out.println("not a legal regex!(It must begin with a letter,ε or (.)");
             return null;
@@ -65,7 +65,7 @@ public class ParseRegex {
         int t;
         if(Character.isLetter(look) || look == 'ε')
             t=0;
-        else t=4;
+        else {t=4;match++;}
         RegexTreeNode node = new RegexTreeNode(look,t,null,null);
         stack.push(node);
 
@@ -90,6 +90,7 @@ public class ParseRegex {
             else if(look == '(') {
                 RegexTreeNode lnode = new RegexTreeNode('(', 4, null, null);
                 stack.push(lnode);
+                match++;
                 //how about the case of "...(..." (right parenthesis is missing)
             }
             else if(look == ')'){
@@ -151,6 +152,7 @@ public class ParseRegex {
                             }
                             RegexTreeNode rnode = new RegexTreeNode(')',5,null,null);
                             stack.push(rnode);
+                            match--;
                         }
                         else {
                             stack.pop();
@@ -202,15 +204,22 @@ public class ParseRegex {
                 }
                 stack.push(unode);
             }
-            else if(Character.isLetter(look) || look == 'ε'){
+            else if(look>='A'&&look<='Z'||look>='a'&&look<='z' || look == 'ε'){
                 RegexTreeNode bnode = new RegexTreeNode(look,0,null,null);
                 stack.push(bnode);
             }
-
+            else{
+                System.out.println("not a legal regex!(It must begin with a letter,ε or (.)");
+                return null;
+            }
             look = this.queue.poll();
         }
 
         //if look == '%'
+        if(match!=0){
+            System.out.println("not a legal regex (')' is missing.)");
+            return null;
+        }
         if(stack.isEmpty()){
             return null;
         }
