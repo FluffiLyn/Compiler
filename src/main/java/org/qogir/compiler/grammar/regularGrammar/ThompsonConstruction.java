@@ -4,9 +4,22 @@ import org.qogir.compiler.FA.State;
 import org.qogir.compiler.util.tree.DefaultTreeNode;
 
 import java.util.ArrayDeque;
-
+/**
+ * An implementation of the Thompson construction algorithm for converting a RE into an NFA.
+ * It takes a RegexTreeNode as input and returns a TNFA.
+ *
+ * @author FluffiLyn,
+ * @author hatimi-master
+ *
+ */
 public class ThompsonConstruction {
 
+    /**
+     * The main function of the Thompson construction algorithm.
+     *
+     * @param node The root node of the regex tree.
+     * @return A TNFA representing the regex.
+     */
     public TNFA translate(RegexTreeNode node) {
 
         if (node == null)
@@ -73,16 +86,16 @@ public class ThompsonConstruction {
         }
         // Type 3: closure
         else if (node.getType() == 3) {
-            //创建NFA
+            // Construct new NFA
             TNFA closure_NFA = translate((RegexTreeNode) node.getFirstChild());
             closure_NFA.getTransitTable().addEdge(closure_NFA.getAcceptingState(), closure_NFA.getStartState(), 'ε');
-            //连接
+            // Connect NFAs
             tnfa.getTransitTable().addEdge(tnfa.getStartState(), closure_NFA.getStartState(), 'ε');
             tnfa.getTransitTable().addEdge(closure_NFA.getAcceptingState(), tnfa.getAcceptingState(), 'ε');
             tnfa.getTransitTable().addEdge(tnfa.getStartState(), tnfa.getAcceptingState(), 'ε');
-            //合并
+            // Merge transit tables
             tnfa.getTransitTable().merge(closure_NFA.getTransitTable());
-            //修改状态
+            // Change states
             closure_NFA.getStartState().setType(State.MIDDLE);
             closure_NFA.getAcceptingState().setType(State.MIDDLE);
         }
