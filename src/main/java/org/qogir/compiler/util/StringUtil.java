@@ -28,4 +28,14 @@ public class StringUtil {
         }
         return trimmedString.toString();
     }
+
+    /**
+     * Check if the char is an English letter.
+     *
+     * @param c a char
+     * @return true if c is a letter, false otherwise
+     */
+    public static Boolean isLetter(char c) {
+        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+    }
 }

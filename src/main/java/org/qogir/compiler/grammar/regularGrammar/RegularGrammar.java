@@ -31,7 +31,7 @@ public class RegularGrammar {
             Regex p = new Regex(name, regex, 0);
             this.patterns.add(p);
             for(Character ch : regex.toCharArray()){
-                if(Character.isLetter(ch) && ch != 'ε' && !symbols.contains(ch)){
+                if(StringUtil.isLetter(ch) && ch != 'ε' && !symbols.contains(ch)){
                     this.symbols.add(ch);
                 }
             }

@@ -5,7 +5,7 @@ import org.qogir.compiler.util.tree.DefaultTreeNode;
 
 import java.util.ArrayDeque;
 /**
- * An implementation of the Thompson construction algorithm for converting a RE into an NFA.
+ * An implementation of the Thompson construction algorithm for converting a RegexTree into an NFA.
  * It takes a RegexTreeNode as input and returns a TNFA.
  *
  * @author FluffiLyn,
