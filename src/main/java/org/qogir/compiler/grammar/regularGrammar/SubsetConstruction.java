@@ -121,20 +121,22 @@ public class SubsetConstruction {
     }
 
 
-    /**
-     * The main function of the subset construction algorithm. Pseudocode:
+    /*
      * Initially, ε-closure(start) is the only state in Dstates, and it's unmarked
-     * while(exists an unmarked state T in Dstates)
+     * while (exists an unmarked state T in Dstates)
      * {
      *     mark T；
-     *     for(every input character ch）
+     *     for (every input character ch)
      *     {
      *         U = ε-closure(move(T,ch));
-     *         if(U isn't in Dstates)
+     *         if (U isn't in Dstates)
      *             add U to Dstates, and don't mark it；
      *         Dtran[T,ch] = U;
      *     }
      * }
+     */
+    /**
+     * The main function of the subset construction algorithm.
      *
      * @param tnfa the original TNFA
      * @return a DFA that accepts the same language as the original NFA
