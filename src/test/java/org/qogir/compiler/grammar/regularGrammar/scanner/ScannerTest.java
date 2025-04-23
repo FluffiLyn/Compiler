@@ -8,8 +8,11 @@ import org.qogir.compiler.grammar.regularGrammar.RDFA;
 
 public class ScannerTest {
     public static void main(String[] args) {
-        String[] regexes = new String[]{"regex1 := c(a|b)*"};
-        //{"regex1 := c(a|b)*"};//{"regex0 := a|ε","regex1 := c(a|b)*"};//"regex1 := c(a|b)*","regex2 := d(f|ea*(g|h))b","c(a|b)*","a|b", "ab*", "d(f|e)","d(f|ea*(g|h))b","c(a|b)*"
+        // 记录开始时间
+        long startTime = System.currentTimeMillis();
+
+        String[] regexes = new String[]{"regex0 := c(a|b)*"};
+        //{"regex1 := a|ε", "regex2 := d(f|ea*(g|h))b","regex3 := c(a|b)*|de|fg|hi"}
 
         //test invalid regex
         //RegularGrammar wrongrg = new RegularGrammar(new String[]{"regex0 := *a","regex1 := (a"});
@@ -33,7 +36,6 @@ public class ScannerTest {
 
         //test constructing the DFA
         System.out.println("Show the DFA:");
-        State.STATE_ID = 0;// reset the state id
         RDFA dfa = scanner.constructDFA(nfa);
         System.out.println(dfa.StateMappingBetweenDFAAndNFAToString());
         System.out.println(dfa.toString());
@@ -43,5 +45,9 @@ public class ScannerTest {
         State.STATE_ID = 0;
         System.out.println(scanner.minimizeDFA(dfa).toString());
 
+        long endTime = System.currentTimeMillis();
+
+        // Output the time taken
+        System.out.println("运行时间: " + (endTime - startTime) + " 毫秒");
     }
 }

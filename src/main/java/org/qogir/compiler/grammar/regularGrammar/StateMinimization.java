@@ -5,17 +5,14 @@ import org.qogir.compiler.FA.State;
 import org.qogir.compiler.util.graph.LabelEdge;
 import org.qogir.compiler.util.graph.LabeledDirectedGraph;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class StateMinimization {
 
     /*
      * 1. Start with an initial partition `P` with two groups:
-     *   - `F`: The set of accepting states.
-     *   - `S`: The set of non-accepting states.
+     *   - `A`: The group of accepting states.
+     *   - `NA`: The group non-accepting states.
      *
      * 2. Loop:
      *    Construct P_new by refining the groups in `P`.
@@ -30,7 +27,6 @@ public class StateMinimization {
      * 4. Final Partition `P_Final` contains the equivalence classes.
      *    Each group in `P_Final` represents a set of equivalent states.
      */
-
     /**
      * Distinguish non-equivalent states in the given DFA.
      *
@@ -38,115 +34,116 @@ public class StateMinimization {
      * @return distinguished equivalent state groups
      */
     private HashMap<Integer, HashMap<Integer, State>> distinguishEquivalentState(RDFA dfa) {
-        // Initialize the step queue to record partitioning steps
+        // Queue for recording distinguish steps
         ArrayDeque<String> stepQueue = new ArrayDeque<>();
 
-        // Initialize the partition with accepting and non-accepting states
+        // Initial partition P
         HashMap<Integer, HashMap<Integer, State>> P = new HashMap<>();
-        HashMap<Integer, State> F = new HashMap<>();
-        HashMap<Integer, State> S = new HashMap<>();
 
+        // Accepting states and non-accepting states
+        HashMap<Integer, State> A = new HashMap<>();
+        HashMap<Integer, State> NA = new HashMap<>();
+
+        // Init A and NA
         for (State s : dfa.getTransitTable().vertexSet()) {
-            if (s.getType() == 2) {
-                F.put(s.getId(), s); // Accepting states
-            } else {
-                S.put(s.getId(), s); // Non-accepting states
+            if (s.getType() == 2)
+                A.put(s.getId(), s);
+            else
+                NA.put(s.getId(), s);
+        }
+
+        // Add the initial groups to P
+        if (!A.isEmpty())
+            P.put(0, A);
+        if (!NA.isEmpty())
+            P.put(1, NA);
+
+        recordDistinguishSteps(stepQueue, P, "Initial Partition");
+
+        // DFA alphabet and transition table
+        ArrayList<Character> alphabet = dfa.getAlphabet();
+        LabeledDirectedGraph<State> tb = dfa.getTransitTable();
+
+        // Construct a map to track which group each state belongs to
+        HashMap<Integer, Integer> stateToGroupMap = new HashMap<>();
+        for (Map.Entry<Integer, HashMap<Integer, State>> entry : P.entrySet()) {
+            for (Integer stateId : entry.getValue().keySet()) {
+                stateToGroupMap.put(stateId, entry.getKey());
             }
         }
 
-        if (!F.isEmpty()) P.put(0, F);
-        if (!S.isEmpty()) P.put(P.size(), S);
-
-        // Record the initial partition
-        recordDistinguishSteps(stepQueue, P, "Initial Partition");
-
-        ArrayList<Character> a = dfa.getAlphabet();
-        LabeledDirectedGraph<State> transitionTable = dfa.getTransitTable();
-
-        boolean changed;
-        do {
-            changed = false;
+        // Loop until no more partitioning
+        boolean change = true;
+        while (change) {
             HashMap<Integer, HashMap<Integer, State>> P_new = new HashMap<>();
+            change = false;
 
-            for (Map.Entry<Integer, HashMap<Integer, State>> G_entry : P.entrySet()) {
-                HashMap<Integer, State> G = G_entry.getValue();
+            for (Map.Entry<Integer, HashMap<Integer, State>> G : P.entrySet()) {
+                HashMap<Integer, State> group = G.getValue();
 
-                if (G.size() == 1) {
-                    P_new.put(P_new.size(), G); // Groups with a single state remain unchanged
+                if (group.size() == 1) {
+                    P_new.put(P_new.size(), group);
                     continue;
                 }
 
-                HashMap<Integer, HashMap<Integer, State>> subgroups = new HashMap<>();
-                for (State s : G.values()) {
-                    int splitKey = getSplitKey(s, a, P, transitionTable);
-                    subgroups.computeIfAbsent(splitKey, k -> new HashMap<>()).put(s.getId(), s);
+                HashMap<Integer, HashMap<Integer, State>> G_new = new HashMap<>();
+
+                for (Character a : alphabet) {
+                    HashMap<Integer, HashMap<Integer, State>> G_split = new HashMap<>();
+
+                    for (Map.Entry<Integer, State> s : group.entrySet()) {
+                        boolean noTransition = true;
+
+                        for (LabelEdge e : tb.edgeSet()) {
+                            if (((State) e.getSource()).getId() == s.getKey() && e.getLabel() == a) {
+                                int targetId = ((State) e.getTarget()).getId();
+                                Integer targetGroup = stateToGroupMap.get(targetId);
+
+                                G_split
+                                        .computeIfAbsent(targetGroup != null ? targetGroup : -1, x -> new HashMap<>())
+                                        .put(s.getKey(), s.getValue());
+                                noTransition = false;
+                                break;
+                            }
+                        }
+
+                        if (noTransition) {
+                            G_split.computeIfAbsent(-1, x -> new HashMap<>()).put(s.getKey(), s.getValue());
+                        }
+                    }
+
+                    if (G_split.size() > 1) {
+                        G_new = G_split;
+                        change = true;
+                        break;
+                    } else {
+                        G_new = G_split;
+                    }
                 }
 
-                if (subgroups.size() > 1) changed = true; // Refinement occurred
-                P_new.putAll(subgroups);
+                for (Map.Entry<Integer, HashMap<Integer, State>> subgroup : G_new.entrySet()) {
+                    P_new.put(P_new.size(), subgroup.getValue());
+                }
             }
 
             P = P_new;
 
-            // Record the refined partition
-            recordDistinguishSteps(stepQueue, P, "Refined Partition");
-        } while (changed);
+            // Update stateToGroupMap
+            stateToGroupMap.clear();
+            for (Map.Entry<Integer, HashMap<Integer, State>> entry : P.entrySet()) {
+                for (Integer stateId : entry.getValue().keySet()) {
+                    stateToGroupMap.put(stateId, entry.getKey());
+                }
+            }
 
-        // Output the partitioning steps
+            recordDistinguishSteps(stepQueue, P, "Refined Partition");
+        }
+
         showDistinguishSteps(stepQueue);
 
         return P;
     }
 
-    private int groupCounter = 0;
-
-    /**
-     * Generate a unique key for a state based on its transitions and the current group set.
-     * This key is used to determine which subgroup the state belongs to.
-     *
-     * @param state           the state to generate the key for.
-     * @param alphabet        the DFA's input alphabet.
-     * @param groupSet        the current group set.
-     * @param transitionTable the DFA's transition table.
-     * @return an integer identifying the group the state belongs to.
-     */
-    private int getSplitKey(State state, ArrayList<Character> alphabet,
-                            HashMap<Integer, HashMap<Integer, State>> groupSet,
-                            LabeledDirectedGraph<State> transitionTable) {
-        StringBuilder keyBuilder = new StringBuilder();
-        for (Character ch : alphabet) {
-            State targetState = null;
-            // Find the target state for ch
-            for (LabelEdge edge : transitionTable.edgeSet()) {
-                if (edge.getSource().equals(state) && edge.getLabel().equals(ch)) {
-                    targetState = (State) edge.getTarget();
-                    break;
-                }
-            }
-            if (targetState != null) {
-                // Ensure the target state is in the group set
-                for (Map.Entry<Integer, HashMap<Integer, State>> groupEntry : groupSet.entrySet()) {
-                    if (groupEntry.getValue().containsKey(targetState.getId())) {
-                        keyBuilder.append(groupEntry.getKey()).append(",");
-                        break;
-                    }
-                }
-            } else {
-                keyBuilder.append("-1,");
-            }
-        }
-
-        // check if the key already exists in the group set
-        String keyString = keyBuilder.toString();
-        for (Map.Entry<Integer, HashMap<Integer, State>> groupEntry : groupSet.entrySet()) {
-            if (groupEntry.getValue().containsKey(state.getId())) {
-                return groupEntry.getKey();
-            }
-        }
-
-        // if the group is new, assign a new identifier
-        return groupCounter++;
-    }
 
     /**
      * Minimize the given DFA.

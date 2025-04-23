@@ -150,6 +150,7 @@ public class Scanner {
      * @return an DFA
      */
     public RDFA constructDFA(TNFA nfa){
+        State.STATE_ID = 0;// reset the state id
         SubsetConstruction subsetConstruction = new SubsetConstruction();
         RDFA dfa = subsetConstruction.subSetConstruct(nfa);
         dfa.setAlphabet(nfa.getAlphabet());
@@ -162,6 +163,7 @@ public class Scanner {
      * @return an DFA
      */
     public RDFA minimizeDFA(RDFA dfa){
+        State.STATE_ID = 0;// reset the state id
         StateMinimization stateMinimization = new StateMinimization();
         RDFA miniDFA = stateMinimization.minimize(dfa);
         miniDFA.setAlphabet(dfa.getAlphabet());
