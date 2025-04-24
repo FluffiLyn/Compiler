@@ -27,6 +27,7 @@ public class StateMinimization {
      * 4. Final Partition `P_Final` contains the equivalence classes.
      *    Each group in `P_Final` represents a set of equivalent states.
      */
+
     /**
      * Distinguish non-equivalent states in the given DFA.
      *

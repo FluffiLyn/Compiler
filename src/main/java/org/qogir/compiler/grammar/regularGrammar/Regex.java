@@ -11,7 +11,7 @@ public class Regex {
     private final String regex;
     private final int priority;
 
-    public Regex(String name, String regex, int priority){
+    public Regex(String name, String regex, int priority) {
         this.name = name;
         this.regex = regex;
         this.priority = priority;

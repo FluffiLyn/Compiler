@@ -9,7 +9,6 @@ import org.qogir.compiler.util.tree.DefaultTreeNode;
  *
  * @author FluffiLyn,
  * @author hatimi-master
- *
  */
 public class ThompsonConstruction {
 
@@ -37,7 +36,7 @@ public class ThompsonConstruction {
             DefaultTreeNode right_node = node.getFirstChild().getNextSibling();
             TNFA left_NFA = translate((RegexTreeNode) left_node);
             TNFA right_NFA = translate((RegexTreeNode) right_node);
-            int count=0;
+            int count = 0;
             while (right_node != null) {
                 // Left accepting state connects to right start state
                 tnfa.getTransitTable().addEdge(left_NFA.getAcceptingState(), right_NFA.getStartState(), 'ε');
@@ -45,7 +44,7 @@ public class ThompsonConstruction {
                 tnfa.getTransitTable().merge(left_NFA.getTransitTable());
                 tnfa.getTransitTable().merge(right_NFA.getTransitTable());
 
-                if(count==0){ //Connection between the first child and the second child
+                if (count == 0) { //Connection between the first child and the second child
                     left_NFA.getStartState().setType(State.START);
                     left_NFA.getAcceptingState().setType(State.MIDDLE);
                     right_NFA.getStartState().setType(State.MIDDLE);
@@ -53,8 +52,7 @@ public class ThompsonConstruction {
                     tnfa.setStartState(left_NFA.getStartState());
                     tnfa.setAcceptingState(right_NFA.getAcceptingState());
                     count++;
-                }
-                else{ //Connection between children except the first one
+                } else { //Connection between children except the first one
                     left_NFA.getStartState().setType(State.MIDDLE);
                     left_NFA.getAcceptingState().setType(State.MIDDLE);
                     right_NFA.getStartState().setType(State.MIDDLE);

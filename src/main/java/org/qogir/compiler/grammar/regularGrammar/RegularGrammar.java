@@ -1,13 +1,14 @@
 package org.qogir.compiler.grammar.regularGrammar;
 
 import org.qogir.compiler.util.StringUtil;
+
 import java.util.ArrayList;
 
 /**
  * Regular Grammar
  * The supported symbols: [A-Za-z] and ε;
  * The supported grammars: a|b, ab, a*, (a)
- *
+ * <p>
  * When instantiate a RegularGrammar object, only the inputs with " string := regular expression " form
  * are accepted. For example:
  * + regex1 := c(a|b)*
@@ -19,9 +20,10 @@ import java.util.ArrayList;
 public class RegularGrammar {
     public ArrayList<Character> symbols = new ArrayList<Character>();//the alphabet for regular grammar
     private final ArrayList<Regex> patterns = new ArrayList<>();
-    public RegularGrammar(String[] regexes){
-        for(String r: regexes){
-            String name = r.substring(0, r.lastIndexOf(":=") - 1) ;
+
+    public RegularGrammar(String[] regexes) {
+        for (String r : regexes) {
+            String name = r.substring(0, r.lastIndexOf(":=") - 1);
             String regex = r.substring(r.lastIndexOf(":=") + 2, r.length());
 
             StringUtil stringUtil = new StringUtil();
@@ -30,17 +32,18 @@ public class RegularGrammar {
 
             Regex p = new Regex(name, regex, 0);
             this.patterns.add(p);
-            for(Character ch : regex.toCharArray()){
-                if(StringUtil.isLetter(ch) && ch != 'ε' && !symbols.contains(ch)){
+            for (Character ch : regex.toCharArray()) {
+                if (StringUtil.isLetter(ch) && ch != 'ε' && !symbols.contains(ch)) {
                     this.symbols.add(ch);
                 }
             }
         }
     }
 
-    public ArrayList<Character> getSymbols(){
+    public ArrayList<Character> getSymbols() {
         return this.symbols;
     }
+
     public ArrayList<Regex> getPatterns() {
         return patterns;
     }

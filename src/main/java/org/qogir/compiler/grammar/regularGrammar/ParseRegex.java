@@ -8,6 +8,7 @@ import java.util.Stack;
 
 /**
  * An implementation of converting a regex to a regex tree.
+ *
  * @author xuyang
  */
 
@@ -18,6 +19,7 @@ public class ParseRegex {
      * Construct a ParseRegex object with a regex.
      * The input string of regex is divided into a sequence of char
      * For convenience, the char '%' indicating the end of the input is appended to the sequence
+     *
      * @param regex a regular expression
      */
     public ParseRegex(Regex regex) {
@@ -41,6 +43,7 @@ public class ParseRegex {
      * them as a concatenation node, taking the conca node as its child when
      * the type of the "look" is operator (type = * ,(, ) or |)，
      * Then the new node is pushed into the stack.
+     *
      * @return a regex tree
      * @author xuyang
      */
@@ -277,6 +280,7 @@ public class ParseRegex {
 
     /**
      * Make nodes in a stack as children of one node.
+     *
      * @param stack holds the nodes that will be merged.
      */
     public RegexTreeNode mergeStackAsOneChild(RegexTreeNode pt, Stack<RegexTreeNode> stack) {

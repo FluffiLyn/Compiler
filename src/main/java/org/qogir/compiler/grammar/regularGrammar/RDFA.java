@@ -16,7 +16,7 @@ public class RDFA extends FiniteAutomaton {
     public RDFA() {
         super();
         this.StateMappingBetweenDFAAndNFA = new HashMap<>();
-        //this.transitTable = new LabeledDirectedGraph<>();
+        //this.transitTable = new LabeledDirectedGraph<>(); // No! This will override the transitTable and lead to wrong output
     }
 
     public RDFA(State startState) {

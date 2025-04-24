@@ -6,14 +6,14 @@ import java.util.ArrayDeque;
 
 public class RegexTree extends DefaultTree<RegexTreeNode> {
 
-    public RegexTree(){
+    public RegexTree() {
         super();
     }
 
     @Override
     public String toString() {
 
-        if(this.root == null)
+        if (this.root == null)
             return null;
 
         StringBuilder treeStr = new StringBuilder();
@@ -21,11 +21,11 @@ public class RegexTree extends DefaultTree<RegexTreeNode> {
         queue.add(this.root);
         RegexTreeNode node = queue.poll();
 
-        while(node != null){
+        while (node != null) {
             treeStr.append("(").append(node.toString()).append(")\n");
             RegexTreeNode childnode = (RegexTreeNode) node.getFirstChild();
 
-            if(childnode != null) {
+            if (childnode != null) {
                 treeStr.append("\t" + "firstChild:(").append(childnode.toString()).append(")\n");
                 queue.add(childnode);
                 childnode = (RegexTreeNode) childnode.getNextSibling();
@@ -43,8 +43,8 @@ public class RegexTree extends DefaultTree<RegexTreeNode> {
         return str.toString();
     }
 
-    public String export(){
-        String treeJson="";
+    public String export() {
+        String treeJson = "";
         return treeJson;
     }
 }

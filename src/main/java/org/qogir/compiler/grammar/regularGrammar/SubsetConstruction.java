@@ -75,7 +75,7 @@ public class SubsetConstruction {
     /**
      * moves(s,ch)
      *
-     * @param s a single state of NFA
+     * @param s  a single state of NFA
      * @param ch the transition symbol
      * @param tb the transition table of NFA
      * @return a set of state reachable from the state s on ch-transition
@@ -135,6 +135,7 @@ public class SubsetConstruction {
      *     }
      * }
      */
+
     /**
      * The main function of the subset construction algorithm.
      *
